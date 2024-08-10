@@ -23,13 +23,13 @@
 int main(int argc, char *argv[])
 {
 
-    int loops = 500;      /* Number of times to run the simulation */
+    int loops = 1000;      /* Number of times to run the simulation */
 
     int verbose = 1;          /* Verbosity level */
-    double xlength = 256.0;     /* Width of simulated domain */
-    double ylength = 128.0;      /* Height of simulated domain */
-    int imax = 256;           /* Number of cells horizontally */
-    int jmax = 128;           /* Number of cells vertically */
+    double xlength = 64.0;     /* Width of simulated domain */
+    double ylength = 64.0;      /* Height of simulated domain */
+    int imax = 64;           /* Number of cells horizontally */
+    int jmax = 64;           /* Number of cells vertically */
 
     char *outname;
     int output = 0;
@@ -111,8 +111,8 @@ int main(int argc, char *argv[])
 
       // printf("Shape number: %d\n", shape);
 
-      double xoffset = -20.0 + (220.0 * ((double)rand() / RAND_MAX));
-      double yoffset = -40.0 + (80 * ((double)rand() / RAND_MAX));
+      double xoffset = -20.0 + (40.0 * ((double)rand() / RAND_MAX));
+      double yoffset = -20.0 + (40.0 * ((double)rand() / RAND_MAX));
       double rotation = 0 + ((double)rand() / RAND_MAX) * (6.2 - 0);
 
       init_flag(flag, imax, jmax, delx, dely, &ibound, shape, xoffset, yoffset, rotation);
