@@ -3,3 +3,5 @@ Dataset_64/
 *.o
 out/
 .DS_Store
+Examples/
+*.pyc
