@@ -3,39 +3,31 @@ import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 import DataProcessor
-import sys
 import CNN32_Model
+import CNN64_Model
+import config
 
 # initialise variables
-epochs = 50
-test_train_split = 0.8
-kernel_size = 3
-learning_rate = 0.001
-model_name = "SimpleNetwork32"
-
-
-if len(sys.argv) > 1:
-    epochs = int(sys.argv[1])
-    test_train_split = float(sys.argv[2])
-    kernel_size = int(sys.argv[3])
-    learning_rate = float(sys.argv[4])
-    model_name = sys.argv[5]
-else:
-    print("Using default values")
+model_type = config.config.model_type
+epochs = config.config.epochs
+test_train_split = config.config.test_train_split
+learning_rate = config.config.learning_rate
+model_name = config.config.model_name
+data_path = config.config.dataset_path
 
 dp = DataProcessor.DataProcessor()
 
 # Load the data
-sdf_shapes = dp.create_sdf_shapes(dp.read_data('Dataset_32/shape'))
-clean_horizontals = dp.read_data('Dataset_32/horizontal')
-clean_verticals = dp.read_data('Dataset_32/vertical')
+sdf_shapes = dp.create_sdf_shapes(dp.read_data(f'{data_path}/shape'))
+clean_horizontals = dp.read_data(f'{data_path}/horizontal')
+clean_verticals = dp.read_data(f'{data_path}/vertical')
 total_velocities = dp.calculate_total_velocities(clean_horizontals, clean_verticals)
 
 # Split the data into training and testing datasets
 training_dataset, test_dataset = dp.create_test_train_data(sdf_shapes, total_velocities, test_train_split)
 
 # Initialise the model, loss function, and optimizer
-model = CNN32_Model.CNN32_Model()
+model = CNN32_Model.CNN32_Model() if (model_type == 32) else CNN64_Model.CNN64_Model()
 criterion = nn.MSELoss()
 optimizer = optim.RMSprop(model.parameters(), lr=learning_rate)
 
@@ -47,7 +39,7 @@ for epoch in range(epochs):  # loop over the dataset multiple times
         # get the inputs; data is a list of [inputs, labels]
         inputs, labels = data
 
-        tensor_inputs = torch.FloatTensor(inputs).reshape(1, 1, 32, 32)
+        tensor_inputs = torch.FloatTensor(inputs).reshape(1, 1, inputs.shape[0], inputs.shape[0])
         tensor_labels = torch.FloatTensor(labels)
 
         # zero the parameter gradients
@@ -74,7 +66,7 @@ print('Finished Training')
 total_mse = 0
 for data in test_dataset:
     inputs, labels = data
-    tensor_inputs = torch.FloatTensor(inputs).reshape(1, 1, 32, 32)
+    tensor_inputs = torch.FloatTensor(inputs).reshape(1, 1, inputs.shape[0], inputs.shape[0])
     tensor_labels = torch.FloatTensor(labels)
 
     tensor_outputs = model(tensor_inputs)
